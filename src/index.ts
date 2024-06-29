@@ -10,9 +10,9 @@ function isError(value: unknown): asserts value is Error {
 }
 
 function assertIsString(value: unknown): asserts value is string {
-  if (typeof value !== 'string') {
-    throw new Error('remote url is not a string');
-  }
+	if (typeof value !== 'string') {
+		throw new Error('remote url is not a string');
+	}
 }
 
 const app = new Hono<{ Bindings: HttpBindings }>();
@@ -48,11 +48,9 @@ app.use(
 const remoteUrl = process.env.REMOTE_URL;
 assertIsString(remoteUrl);
 
-
 app.all('/health', (c) => {
-  return c.json({ status: 'ok', url: remoteUrl });
-})
-
+	return c.json({ status: 'ok', url: remoteUrl });
+});
 
 app.all('*', async (c) => {
 	const headers = new Headers(c.env.incoming.headers as Record<string, string>);
@@ -61,13 +59,14 @@ app.all('*', async (c) => {
 	const t = await c.req.text();
 
 	try {
-		const res = await fetch(`${remoteUrl.endsWith('/') ? 
-      remoteUrl.slice(0, -1) : remoteUrl
-    }${url}`, {
-			method,
-			headers,
-			body: t,
-		});
+		const res = await fetch(
+			`${remoteUrl.endsWith('/') ? remoteUrl.slice(0, -1) : remoteUrl}${url}`,
+			{
+				method,
+				headers,
+				body: t,
+			}
+		);
 
 		const remoteBody = await res.text();
 		const remoteHeaders = Object.fromEntries(res.headers.entries());
