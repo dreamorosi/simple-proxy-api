@@ -56,7 +56,7 @@ jobs:
       - name: Build
         run: |
           docker build -t simple-proxy-api .
-          docker run -d -p 3000:3000 simple-proxy-api
+          docker run -d -e REMOTE_URL=https://httpbin.org -p 3000:3000 simple-proxy-api
       - name: Test
         # Run only unit and contract tests
         run: npm t
