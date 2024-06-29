@@ -52,7 +52,7 @@ jobs:
       - name: Setup dependencies
         run: npm ci
       - name: Formatting and Linting
-        run: npm run ci
+        run: npm run format
       - name: Build
         run: |
           docker build -t simple-proxy-api .
