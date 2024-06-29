@@ -1,0 +1,62 @@
+name: Code quality
+
+# PROCESS
+#
+# 1. Install all dependencies and spin off containers for all targeted Node.js versions
+# 2. Run code formatters and linters (various checks) for code standard
+# 3. Run test suite for regressions except end-to-end (unit, contract)
+
+# USAGE
+#
+# Always triggered on new PRs, PR changes and PR merge.
+
+
+on:
+  pull_request:
+    paths-ignore:
+      - ".vscode/**"
+      - ".gitignore"
+      - "README.md"
+    branches:
+      - main
+  push:
+    paths-ignore:
+      - ".vscode/**"
+      - ".gitignore"
+      - "README.md"
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  quality_check:
+    runs-on: ubuntu-latest
+    env:
+      NODE_ENV: dev
+    strategy:
+      matrix:
+        version: [20]
+      fail-fast: false
+    permissions:
+      contents: read  # checkout code only
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332  # v4.1.7
+      - name: Setup NodeJS
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: ${{ matrix.version }}
+          cache: "npm"
+      - name: Setup dependencies
+        run: npm ci
+      - name: Formatting and Linting
+        run: npm run ci
+      - name: Build
+        run: |
+          docker build -t simple-proxy-api .
+          docker run -d -p 3000:3000 simple-proxy-api
+      - name: Test
+        # Run only unit and contract tests
+        run: npm t
