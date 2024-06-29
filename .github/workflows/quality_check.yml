@@ -57,4 +57,4 @@ jobs:
         run: |
           docker build -t simple-proxy-api .
           docker run -d -e REMOTE_URL=https://httpbin.org -p 3000:3000 simple-proxy-api
-          run: npm t
+          npm t
