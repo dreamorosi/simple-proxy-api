@@ -24,16 +24,21 @@ finch build -t simple-proxy-api .
 ## Run
 
 ```sh
-finch run -d -e REMOTE_URL=https://your-api.com/api -p 3000:3000 simple-api-proxy
+finch run -d -e REMOTE_URL=https://your-api.com/ -p 3000:3000 simple-api-proxy
 ``` 
 
-Then, you can make requests to `http://localhost:3000` and they will be forwarded to `https://your-api.com/api`.
+Then, you can make requests to `http://localhost:3000` and they will be forwarded to `https://your-api.com`.
 
 You can also check the health of the service by making a request to `http://localhost:3000/health`, this will return a response like:
 
 ```json
 {
   "status": "ok",
-  "url": "https://your-api.com/api"
+  "remoteUrl": "https://your-api.com/api",
+  "allowedOrigin": "http://localhost:5713"
 }
 ```
+
+Full configuration options:
+- `REMOTE_URL`: The target URL to forward requests to.
+- `ORIGIN`: The allowed origin for CORS requests. Defaults to `http://localhost:5173`.

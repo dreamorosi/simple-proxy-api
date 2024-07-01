@@ -15,15 +15,19 @@ function assertIsString(value: unknown): asserts value is string {
 	}
 }
 
+const origin = process.env.ORIGIN || 'http://localhost:5173';
+
 const app = new Hono<{ Bindings: HttpBindings }>();
 app.use(logger());
 app.use(
 	'*',
 	cors({
-		origin: '*',
+		origin,
 		allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'HEAD', 'PATCH'],
 		allowHeaders: [
 			'Authorization',
+			'cookie',
+			'Cookie',
 			'Content-Type',
 			'Accept',
 			'Origin',
@@ -37,6 +41,7 @@ app.use(
 		maxAge: 600,
 		credentials: true,
 		exposeHeaders: [
+			'Set-Cookie',
 			'Content-Length',
 			'Content-Range',
 			'Content-Disposition',
@@ -49,14 +54,14 @@ const remoteUrl = process.env.REMOTE_URL;
 assertIsString(remoteUrl);
 
 app.all('/health', (c) => {
-	return c.json({ status: 'ok', url: remoteUrl });
+	return c.json({ status: 'ok', remoteUrl: remoteUrl, allowedOrigin: origin });
 });
 
 app.all('*', async (c) => {
 	const headers = new Headers(c.env.incoming.headers as Record<string, string>);
 	const method = c.env.incoming.method;
 	const url = c.env.incoming.url;
-	const t = await c.req.text();
+	const bodyText = await c.req.text();
 
 	try {
 		const res = await fetch(
@@ -64,7 +69,7 @@ app.all('*', async (c) => {
 			{
 				method,
 				headers,
-				body: t,
+				body: method === 'GET' || method === 'HEAD' ? null : bodyText,
 			}
 		);
 
