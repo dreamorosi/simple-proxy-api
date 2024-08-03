@@ -13,11 +13,11 @@
 		]
 	},
 	"dependencies": {
-		"@hono/node-server": "^1.11.4",
-		"hono": "^4.4.10"
+		"http-proxy": "^1.18.1"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.8.3",
+		"@types/http-proxy": "^1.17.14",
 		"@types/node": "^20.11.17",
 		"husky": "^9.0.11",
 		"lint-staged": "^15.2.7",
